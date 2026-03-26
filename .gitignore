@@ -1,0 +1,31 @@
+# Runtime state
+.citadel/campaigns/*.md
+.citadel/campaigns/completed/*.md
+.citadel/coordination/claims/*.json
+.citadel/coordination/instances/*.json
+.citadel/fleet/briefs/*
+!.citadel/fleet/briefs/.gitkeep
+.citadel/fleet/outputs/*
+!.citadel/fleet/outputs/.gitkeep
+.citadel/postmortems/*
+!.citadel/postmortems/.gitkeep
+.citadel/research/*
+!.citadel/research/.gitkeep
+.citadel/screenshots/*
+!.citadel/screenshots/.gitkeep
+.citadel/telemetry/*.jsonl
+.citadel/telemetry/*.log
+.citadel/telemetry/.typecheck-notified
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,25 @@
+{
+  "name": "citadel-codex",
+  "version": "0.1.0",
+  "description": "Codex-native orchestration foundation derived from Citadel concepts",
+  "license": "MIT",
+  "scripts": {
+    "coord": "node runtime/scripts/coordination.js",
+    "coord:status": "node runtime/scripts/coordination.js status",
+    "coord:sweep": "node runtime/scripts/coordination.js sweep",
+    "compress:discovery": "node runtime/scripts/compress-discovery.cjs",
+    "parse:handoff": "node runtime/scripts/parse-handoff.cjs"
+  },
+  "keywords": [
+    "codex",
+    "citadel",
+    "agent",
+    "orchestration",
+    "campaign",
+    "fleet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/special-place-administrator/citadel_codex.git"
+  }
+}
