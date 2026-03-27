@@ -1,6 +1,12 @@
 # Skill Reference
 
-23 skills organized by category. Each skill is a markdown workflow definition in `skills/<name>/SKILL.md`.
+24 skills organized by category. Each skill is a markdown workflow definition in `skills/<name>/SKILL.md`.
+
+## Entry Point
+
+| Skill | Description |
+|-------|-------------|
+| **`do`** | **Unified intent router — single entry point for all work.** Classifies user intent through 4 tiers, routes to the cheapest capable skill or orchestrator. Start here. |
 
 ## Core Orchestration
 

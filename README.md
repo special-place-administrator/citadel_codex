@@ -2,14 +2,14 @@
 
 # Citadel Codex
 
-**Agent orchestration framework for AI-native development workflows**
+**AI agent orchestration skills — one entry point, 24 workflows, any harness**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/Tests-49%20passing-brightgreen)](tests/)
-[![Skills](https://img.shields.io/badge/Skills-23%20installed-purple)](docs/SKILLS.md)
+[![Skills](https://img.shields.io/badge/Skills-24%20installed-purple)](docs/SKILLS.md)
 
-*Derived from [Citadel](https://github.com/SethGammon/Citadel) concepts, rebuilt as a platform-agnostic CLI.*
+*Codex-native port of [Citadel](https://github.com/SethGammon/Citadel). Same orchestration skills, any AI harness.*
 
 </div>
 
@@ -17,423 +17,263 @@
 
 ## What is Citadel Codex?
 
-Citadel Codex is an **orchestration foundation** for AI coding agents. It provides structured workflows (skills), multi-session campaign management, parallel fleet execution, and an intelligent intent router — all driven through a simple CLI with zero vendor lock-in.
+Citadel Codex is a **skill library** for AI coding agents. You install the skills into your harness — [Codex CLI](https://github.com/openai/codex), Claude Code, Cursor, Aider, or any tool that can read markdown skill files — and they give your agent structured workflows for everything from code review to multi-session campaigns.
 
-It takes the battle-tested orchestration ideas from the Citadel framework and strips away the platform-specific integration layer, replacing it with explicit CLI commands that work with **any** AI coding assistant: OpenAI Codex, Claude Code, Cursor, Aider, Continue, or your own tooling.
+The single entry point is the **`do` skill**. Tell it what you want in plain language. It classifies your intent, picks the cheapest capable skill, and orchestrates execution. You don't choose between 24 skills — `do` chooses for you.
 
-> [!NOTE]
-> **This is not a plugin.** Citadel Codex is a standalone framework. No `.claude/` directories, no slash commands, no hook bus. Just Node.js and your terminal.
-
-### `/do` is dead — long live the CLI
-
-Upstream Citadel's primary entry point was the `/do` slash command — a magic router inside Claude's plugin system. **Citadel Codex kills `/do` entirely.** In its place:
-
-| What died | What replaced it |
-|-----------|-----------------|
-| `/do review my code` | `node runtime/cli.js route "review my code"` |
-| `/do debug this crash` | `node runtime/cli.js route "debug this crash"` |
-| `/setup` | `node runtime/cli.js setup` |
-| `/do continue` | `node runtime/cli.js continue` |
-| `.claude/harness.json` routing config | `core/router/classify-intent.js` (code, not config) |
-| `.planning/` state directory | `.citadel/` state directory |
-| Plugin hook bus (stdin JSON events) | Explicit CLI invocations |
-| `CLAUDE_PROJECT_DIR` env var | Standard `process.cwd()` |
-
-> [!CAUTION]
-> If you're coming from upstream Citadel: **every `/do` and `/setup` reference is gone.** Skills, campaigns, fleet orchestration, and the routing logic all survived — but the interface is completely rebuilt. Nothing depends on Claude's plugin lifecycle.
+> [!IMPORTANT]
+> **You never run CLI commands directly.** Skills are loaded by your AI harness. The `runtime/` directory provides supporting infrastructure (state management, intent classification, checks) that the skills reference — but users interact through their harness, not through `node` commands.
 
 ---
 
-## Table of Contents
+## The `do` Skill — Your Single Entry Point
 
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
-- [Skills](#skills)
-- [Intent Router](#intent-router)
-- [Runtime Checks](#runtime-checks)
-- [Orchestration Ladder](#orchestration-ladder)
-- [Agent Configs](#agent-configs)
-- [npm Scripts](#npm-scripts)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
-- [Testing](#testing)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
+```
+User: "do review my authentication module"
+       │
+   ┌───▼────────────────────────────────────┐
+   │           do (skills/do/SKILL.md)       │
+   │                                         │
+   │  Tier 0: "review" → skill:review  ✓    │
+   │                                         │
+   │  → Loads skills/review/SKILL.md         │
+   │  → Agent follows 5-pass review workflow │
+   └─────────────────────────────────────────┘
+```
+
+The `do` skill is what upstream Citadel's `/do` command was — **the unified router that makes all other skills accessible through natural language.** It was the core of Citadel, and it's the core of Citadel Codex.
+
+### What changed from upstream Citadel
+
+| Upstream (Claude Code plugin) | Citadel Codex (any harness) |
+|-------------------------------|----------------------------|
+| `/do review my code` | `do review my code` (or however your harness invokes skills) |
+| Skills in `.claude/skills/` | Skills in `skills/` |
+| State in `.planning/` | State in `.citadel/` |
+| Routing config in `.claude/harness.json` | Routing built into `do` skill + `classify-intent.js` |
+| `CLAUDE_PROJECT_DIR` env var | Standard working directory |
+| Claude plugin lifecycle hooks | Explicit check scripts (referenced by skills when needed) |
+
+**What didn't change:** The skills themselves. The orchestration model. The routing logic. The campaign/fleet lifecycle. Everything that made Citadel useful is preserved — just decoupled from Claude's plugin system.
 
 ---
 
 ## Installation
 
-> [!IMPORTANT]
-> Requires **Node.js 18+** and **Git**. No other dependencies — Citadel Codex uses only Node.js built-ins.
+### In Codex CLI
 
-### Clone and Initialize
+Point your Codex system prompt or project config at the skills directory:
+
+```
+You have access to Citadel Codex skills in the `skills/` directory.
+When the user asks you to do something, read `skills/do/SKILL.md` and
+follow its routing protocol to find the right skill for the task.
+```
+
+### In Claude Code
+
+Add to your `CLAUDE.md` or project instructions:
+
+```
+Citadel Codex skills are available in `skills/`. The `do` skill
+(skills/do/SKILL.md) is the unified entry point — read it when the
+user gives a task, and follow its routing protocol.
+```
+
+### In Any Other Harness
+
+The skills are **plain markdown files**. Any AI agent that can read files can use them. Point your agent at `skills/do/SKILL.md` as the entry point.
+
+### Initialize State
+
+Your agent (or you, once) needs to create the `.citadel/` state directory:
 
 ```bash
-# Clone the repository
-git clone https://github.com/special-place-administrator/citadel_codex.git
-cd citadel_codex
-
-# Initialize the state tree
 node runtime/cli.js init
-
-# Detect your project stack
-node runtime/cli.js setup
 ```
 
-### Add to an Existing Project
-
-```bash
-# Copy citadel_codex into your project (or add as a git submodule)
-git submodule add https://github.com/special-place-administrator/citadel_codex.git .citadel-codex
-
-# Initialize state in your project root
-node .citadel-codex/runtime/cli.js init
-```
-
-### Verify Installation
-
-```bash
-node runtime/cli.js status
-```
-
-You should see a status report listing 23 installed skills and empty campaign/fleet state.
-
----
-
-## Quick Start
-
-```bash
-# 1. Initialize the .citadel/ state directory
-node runtime/cli.js init
-
-# 2. Auto-detect your language, framework, and test runner
-node runtime/cli.js setup
-
-# 3. See what's installed and what's active
-node runtime/cli.js status
-
-# 4. Route a natural language intent to the right skill
-node runtime/cli.js route "review my authentication code"
-# → Tier 0: skill:review — Code review
-
-# 5. Resume any active campaign or fleet session
-node runtime/cli.js continue
-```
-
-> [!TIP]
-> Use **npm scripts** for convenience: `npm run status`, `npm run init`, `npm run route -- "debug this crash"`. See [npm Scripts](#npm-scripts) for the full list.
+This creates the directory tree for campaigns, fleet sessions, coordination, intake, templates, and telemetry. After this, the agent manages state through the skills — you don't touch it again.
 
 ---
 
 ## How It Works
 
-Citadel Codex organizes AI agent work into three layers:
-
 ```
-┌─────────────────────────────────────────────────┐
-│                  Intent Router                   │
-│  Natural language → skill/command classification │
-│  4 tiers: Pattern → State → Registry → LLM      │
-└──────────────────────┬──────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                    Your AI Harness                       │
+│          (Codex CLI, Claude Code, Cursor, etc.)          │
+└──────────────────────┬──────────────────────────────────┘
+                       │ User says: "do [anything]"
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│              do skill (skills/do/SKILL.md)               │
+│                                                          │
+│  Tier 0: Pattern match (instant)                         │
+│  Tier 1: Active campaign/fleet detection                 │
+│  Tier 2: Skill name matching                             │
+│  Tier 3: LLM complexity classification (if needed)       │
+│                                                          │
+│  → Routes to the cheapest capable skill                  │
+└──────────────────────┬──────────────────────────────────┘
                        │
-┌──────────────────────▼──────────────────────────┐
-│                    Skills                        │
-│  23 markdown workflow definitions                │
-│  Portable, composable, platform-agnostic         │
-└──────────────────────┬──────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────┐
-│              Orchestration State                 │
-│  .citadel/ — campaigns, fleet, coordination,     │
-│  intake, templates, telemetry, config            │
-└─────────────────────────────────────────────────┘
+          ┌────────────┼────────────────┐
+          ▼            ▼                ▼
+   ┌──────────┐  ┌──────────┐   ┌──────────┐
+   │  Skills  │  │ Marshal  │   │  Archon  │
+   │ (direct) │  │ (chain)  │   │(campaign)│
+   └──────────┘  └──────────┘   └──────────┘
 ```
 
-1. **You describe what you want** in natural language
-2. **The intent router** classifies it to the right skill or command
-3. **The skill** provides a structured workflow your AI agent follows
-4. **State** is tracked in `.citadel/` for multi-session continuity
+The `do` skill classifies your intent through 4 tiers, each more expensive than the last:
+
+| Tier | Method | Cost | When |
+|------|--------|------|------|
+| **0** | Regex/keyword match | ~0 tokens | Known skill triggers ("review", "debug", "scaffold") |
+| **1** | Active state scan | ~0 tokens | Running campaign or fleet session exists |
+| **2** | Skill name match | ~0 tokens | Input contains a skill name |
+| **3** | LLM classification | ~500 tokens | Ambiguous input needs complexity analysis |
+
+> [!NOTE]
+> **Tiers 0-2 handle 95%+ of requests with zero LLM cost.** Tier 3 only fires for genuinely ambiguous input like "make this codebase better" where the scope and complexity need classification.
 
 ---
 
-## Skills
-
-23 skills organized into 6 categories. Each skill is a self-contained markdown workflow definition in `skills/<name>/SKILL.md`.
+## Skills (24)
 
 ### Orchestration
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `archon` | Multi-session campaign orchestrator. Breaks work into phases, tracks progress across sessions. |
-| `fleet` | Parallel campaign coordinator. Splits work into non-overlapping waves with shared discoveries. |
-| `marshal` | Meta-orchestrator that chains skills into a completed deliverable within a single session. |
-| `autopilot` | Intake-to-delivery pipeline. Processes pending items from `.citadel/intake/` automatically. |
+| **`do`** | **Unified entry point.** Routes any intent to the right skill. Start here. |
+| `marshal` | Chains multiple skills in a single session to produce a deliverable. |
+| `archon` | Multi-session campaigns with phases, tracked in `.citadel/campaigns/`. |
+| `fleet` | Parallel wave-based execution with shared discoveries between agents. |
+| `autopilot` | Processes `.citadel/intake/` queue: briefs ideas, executes approved work. |
 
 ### Development Lifecycle
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `prd` | Generates a Product Requirements Document from natural language descriptions. |
-| `architect` | Produces implementation architecture: file tree, component breakdown, data model, phased build plan. |
-| `scaffold` | Project-aware file generation that matches existing codebase conventions. |
-| `create-app` | End-to-end app creation from a single description. Five tiers from blank project to feature addition. |
+| `prd` | Generates a Product Requirements Document from a natural language description. |
+| `architect` | Takes a PRD, produces file tree, component breakdown, data model, phased build plan. |
+| `scaffold` | Generates files matching your project's existing conventions (naming, imports, tests). |
+| `create-app` | End-to-end app creation. Five tiers: blank project → guided → templated → generated → feature add. |
 
 ### Code Quality
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `review` | 5-pass structured code review: correctness, security, performance, readability, consistency. |
-| `refactor` | Safe multi-file refactoring with automatic rollback and type/test baseline verification. |
-| `test-gen` | Generate and verify tests (happy path, edge cases, error paths) using the project's own framework. |
-| `qa` | Browser-based QA verification. Launches a real browser, navigates, clicks, fills forms, tests flows. |
-| `live-preview` | Mid-build visual verification loop. Takes screenshots during construction to catch regressions early. |
+| `review` | 5-pass code review: correctness, security, performance, readability, consistency. |
+| `refactor` | Multi-file refactoring with automatic rollback. Baseline → plan → execute → verify. |
+| `test-gen` | Generates tests (happy path, edge cases, error paths) using the project's own framework. |
+| `qa` | Browser-based QA. Launches a real browser, navigates, clicks, fills forms, tests user flows. |
+| `live-preview` | Screenshots components during construction — catches visual regressions mid-build. |
 
-### Research & Investigation
+### Research & Debugging
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `research` | Focused investigations with confidence levels and source citations. |
-| `research-fleet` | Parallel research using Fleet wave mechanics. Multiple scout agents investigate different angles. |
-| `systematic-debugging` | Four-phase root cause analysis: observe, hypothesize, verify, fix. |
-| `triage` | GitHub issue and PR investigator. Classifies, searches codebase for root causes. |
+| `research` | Structured investigation with confidence levels and source citations. |
+| `research-fleet` | Parallel research with multiple scout agents investigating different angles simultaneously. |
+| `systematic-debugging` | Four-phase root cause analysis: observe → hypothesize → verify → fix. |
+| `triage` | Pulls GitHub issues/PRs, classifies them, searches the codebase for root causes. |
 
 ### Documentation & Design
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `doc-gen` | Documentation generator: function-level (JSDoc/docstrings), module-level (READMEs), and API reference. |
-| `design` | Generates and maintains a design manifest for visual consistency across the project. |
-| `postmortem` | Auto-generates a structured postmortem from a completed campaign's telemetry and feature log. |
+| `doc-gen` | Three modes: function-level (JSDoc), module-level (READMEs), API reference. |
+| `design` | Extracts or generates a design manifest for visual consistency. |
+| `postmortem` | Generates a structured retrospective from a completed campaign's telemetry. |
 
 ### Meta
 
-| Skill | Description |
+| Skill | What it does |
 |-------|-------------|
-| `create-skill` | Creates new skills from repeating patterns. Interview-driven with failure mode analysis. |
-| `experiment` | Automated optimization loop. Proposes changes in isolated worktrees, measures with a fitness function. |
-| `session-handoff` | Summarize the current session into a compact HANDOFF block for the next session or agent. |
-
-> [!TIP]
-> Run `node runtime/cli.js route "<what you want to do>"` and the router will pick the right skill for you.
-
----
-
-## Intent Router
-
-The router classifies natural language input into the correct skill or command through **4 tiers**, from cheapest to most expensive:
-
-```
-Input: "review my authentication code"
-         │
-         ▼
-┌─ Tier 0: Pattern Match ──────────────────────┐
-│  Regex/keyword scan            Cost: ~0       │
-│  Latency: <1ms                                │
-│  "review" → skill:review  ✓ MATCH             │
-└───────────────────────────────────────────────┘
-         │ (no match? ↓)
-┌─ Tier 1: Active State ───────────────────────┐
-│  Scans .citadel/campaigns/ and fleet/briefs/  │
-│  Cost: ~0    Latency: <100ms                  │
-│  Routes to 'continue' if active work found    │
-└───────────────────────────────────────────────┘
-         │ (no match? ↓)
-┌─ Tier 2: Skill Registry ────────────────────┐
-│  Matches input against skills/*/SKILL.md      │
-│  Cost: ~0    Latency: <10ms                   │
-│  Fuzzy name matching on all 23 skills         │
-└───────────────────────────────────────────────┘
-         │ (no match? ↓)
-┌─ Tier 3: LLM Classifier (optional) ─────────┐
-│  Async fallback via OpenAI-compatible API     │
-│  Cost: varies    Latency: network-bound       │
-│  Requires CITADEL_LLM_ENDPOINT env var        │
-└───────────────────────────────────────────────┘
-```
-
-### Router Examples
-
-```bash
-node runtime/cli.js route "review my code"
-# → Tier 0: skill:review — Code review
-
-node runtime/cli.js route "debug this crash"
-# → Tier 0: skill:systematic-debugging — Root cause analysis
-
-node runtime/cli.js route "create a new React app"
-# → Tier 0: skill:create-app — End-to-end app creation
-
-node runtime/cli.js route "research fleet results"
-# → Tier 0: skill:research-fleet — Parallel multi-scout research
-```
-
-### Tier 3 LLM Configuration
-
-> [!WARNING]
-> Tier 3 is **optional** and requires external API access. Tiers 0-2 handle the vast majority of intents without any API calls.
-
-```bash
-# Ollama (local)
-export CITADEL_LLM_ENDPOINT="http://localhost:11434/v1/chat/completions"
-export CITADEL_LLM_MODEL="llama3"
-
-# OpenAI
-export CITADEL_LLM_ENDPOINT="https://api.openai.com/v1/chat/completions"
-export CITADEL_LLM_MODEL="gpt-4o-mini"
-export CITADEL_LLM_API_KEY="sk-..."
-```
-
-Use `classifyAsync()` in code to access Tier 3. The synchronous `classify()` function remains unchanged (Tiers 0-2 only).
-
----
-
-## Runtime Checks
-
-Three explicit verification commands replacing traditional hook-based automation:
-
-### Post-Edit Check
-
-```bash
-node runtime/checks/post-edit.js --path <file>
-# or: npm run check:post-edit -- --path src/main.ts
-```
-
-Language-adaptive type checking and lint:
-- **TypeScript** — `tsc --noEmit`, filters errors to the edited file
-- **Python** — `mypy` or `pyright` (whichever is available)
-- **Go** — `go vet`
-- **Rust** — `cargo check`
-- **All JS/TS/CSS** — Performance lint (`confirm()`, `alert()`, `transition-all`)
-
-Exit: `0` = clean, `2` = errors found
-
-### Quality Gate
-
-```bash
-node runtime/checks/quality-gate.js [--scope <dir>]
-# or: npm run check:quality -- --scope src/
-```
-
-Scans git-changed files for anti-patterns:
-- `no-confirm-alert` — Catches `confirm()` and `alert()` calls
-- `no-transition-all` — Catches `transition-all` in CSS
-- `no-magic-intervals` — Catches hardcoded `setInterval` values
-
-Exit: `0` = clean, `1` = violations found
-
-### Circuit Breaker
-
-```bash
-node runtime/checks/circuit-breaker.js --record-failure [--tool <name>] [--error <msg>]
-node runtime/checks/circuit-breaker.js --status
-node runtime/checks/circuit-breaker.js --reset
-# or: npm run check:breaker -- --status
-```
-
-Tracks consecutive failures and breaks retry loops:
-- **3 failures** — Suggests changing approach (exit code 1)
-- **5 lifetime trips** — Escalates to "stop and rethink" warning
-- State stored in `.citadel/telemetry/circuit-breaker.json`
+| `create-skill` | Creates new skills from your repeating patterns. Interview-driven. |
+| `experiment` | Optimization loop: proposes changes in worktrees, measures with a fitness function. |
+| `session-handoff` | Summarizes the session into a HANDOFF block for the next session or agent. |
 
 ---
 
 ## Orchestration Ladder
 
 > [!IMPORTANT]
-> **Always use the cheapest level that fits the work.** Don't use campaigns for a one-file fix. Don't use direct execution for a multi-week refactor.
+> **Always use the cheapest level that fits.** The `do` skill enforces this automatically — it will never route a typo fix to a campaign.
 
-| Level | When to Use | Entry Point | State |
-|-------|-------------|-------------|-------|
-| **Direct** | Small, bounded tasks (minutes) | Just do it | None |
-| **Skills** | Repeatable workflows (single session) | `route "<intent>"` | None |
-| **Marshal** | Multi-skill chains (single session) | `route "orchestrate"` | In-memory |
-| **Archon** | Multi-session phased work (days/weeks) | `route "campaign"` | `.citadel/campaigns/` |
-| **Fleet** | Parallel wave-based execution | `route "fleet"` | `.citadel/fleet/` |
+| Level | When | Duration | State |
+|-------|------|----------|-------|
+| **Direct action** | Trivial: fix typo, rename variable | Minutes | None |
+| **Single skill** | Focused: review, debug, scaffold | 10-30 min | None |
+| **Marshal** | Multi-skill chain in one session | 1-2 hours | In-memory |
+| **Archon** | Multi-session phased work | Days/weeks | `.citadel/campaigns/` |
+| **Fleet** | Parallel execution across agents | Hours | `.citadel/fleet/` |
 
-### Campaign Lifecycle
+### Campaign Lifecycle (Archon)
 
 ```
 New campaign → .citadel/campaigns/<name>.md
-   │
-   ├── Phase 1: Research & Design
-   ├── Phase 2: Implementation
-   ├── Phase 3: Testing & QA
-   └── Phase N: Completion
-   │
-   └── Completed → .citadel/campaigns/completed/
+    ├── Phase 1: Research & Design
+    ├── Phase 2: Implementation
+    ├── Phase 3: Testing & QA
+    └── Phase N: Completion → .citadel/campaigns/completed/
 ```
 
 ### Fleet Execution
 
 ```
-Fleet brief → .citadel/fleet/briefs/<session>.md
-   │
-   ├── Wave 1: Agent A (module-1), Agent B (module-2)
-   ├── Wave 2: Agent C (integration), Agent D (tests)
-   └── Wave N: Final verification
-   │
-   └── Outputs → .citadel/fleet/outputs/
+Brief → .citadel/fleet/briefs/<session>.md
+    ├── Wave 1: Agent A (module-1), Agent B (module-2)  [parallel]
+    ├── Wave 2: Agent C (integration)  [depends on Wave 1]
+    └── Outputs → .citadel/fleet/outputs/
 ```
 
 ---
 
 ## Agent Configs
 
-Four pre-configured agent role definitions in `agents/`:
+Four pre-built agent role definitions in `agents/`:
 
 | Agent | Role |
 |-------|------|
-| `arch-reviewer` | Architecture review — validates design decisions and structural patterns |
-| `archon` | Campaign orchestration — manages phases, tracks progress, preserves context |
-| `fleet` | Fleet coordination — assigns work to waves, manages shared discoveries |
-| `knowledge-extractor` | Knowledge extraction — pulls structured knowledge from codebases and docs |
+| `arch-reviewer` | Architecture review and design validation |
+| `archon` | Campaign phase management and context preservation |
+| `fleet` | Wave assignment, discovery sharing, coordination safety |
+| `knowledge-extractor` | Structured knowledge extraction from codebases |
 
 ---
 
-## npm Scripts
+## Runtime Infrastructure
 
-All commands are available as npm scripts for convenience:
+> [!NOTE]
+> This section is for **contributors and harness integrators**, not end users. Your AI agent references these internally when skills need state management or checks.
 
-### CLI Commands
+### State Management
 
 ```bash
-npm run init              # Initialize .citadel/ state tree
-npm run status            # Show orchestration state
-npm run setup             # Detect stack, generate config
-npm run continue          # Resume active campaign/fleet
-npm run route -- "text"   # Route intent to skill
+node runtime/cli.js init       # Create .citadel/ state tree (run once)
+node runtime/cli.js setup      # Auto-detect language, framework, test runner
+node runtime/cli.js status     # Show campaigns, fleet, intake, skills
+node runtime/cli.js continue   # Resume active campaign or fleet session
+node runtime/cli.js route "x"  # Test intent classification
 ```
 
 ### Runtime Checks
 
-```bash
-npm run check:post-edit -- --path <file>    # Type check + lint
-npm run check:quality -- --scope <dir>      # Anti-pattern scan
-npm run check:breaker -- --status           # Circuit breaker state
-```
+Skills reference these when they need verification:
 
-### Testing
+| Check | What it does | Exit |
+|-------|-------------|------|
+| `runtime/checks/post-edit.js --path <file>` | Language-adaptive type check + lint (TS, Python, Go, Rust) | 0=clean, 2=errors |
+| `runtime/checks/quality-gate.js [--scope <dir>]` | Anti-pattern scan on git-changed files | 0=clean, 1=violations |
+| `runtime/checks/circuit-breaker.js --status` | Failure-loop detection (3 fails = change approach) | 0=ok, 1=tripped |
 
-```bash
-npm test                  # Run all 49 tests
-npm run test:router       # Router tests only
-npm run test:commands     # Command tests only
-npm run test:checks       # Check tests only
-npm run test:infra        # Infrastructure tests only
-```
+### Intent Router
 
-### Utilities
-
-```bash
-npm run coord             # Coordination script
-npm run coord:status      # Show coordination state
-npm run coord:sweep       # Sweep stale claims
-npm run compress:discovery  # Compress discovery briefs
-npm run parse:handoff     # Parse HANDOFF blocks
-```
+The `do` skill's routing logic is backed by `core/router/classify-intent.js`:
+- `classify(input)` — synchronous, Tiers 0-2
+- `classifyAsync(input)` — async, adds Tier 3 LLM fallback
+- Tier 3 uses any OpenAI-compatible endpoint (Ollama, OpenAI, etc.) via `CITADEL_LLM_ENDPOINT`
 
 ---
 
@@ -441,70 +281,61 @@ npm run parse:handoff     # Parse HANDOFF blocks
 
 ```
 citadel_codex/
-├── core/
-│   └── router/
-│       ├── classify-intent.js     # 4-tier intent router
-│       └── llm-classifier.js      # Tier 3 LLM fallback module
-├── skills/                        # 23 skill definitions
-│   ├── archon/SKILL.md
-│   ├── fleet/SKILL.md
-│   ├── review/SKILL.md
-│   ├── research/SKILL.md
-│   └── ... (19 more)
-├── agents/                        # 4 agent role configs
+├── skills/                         # ← THIS IS THE PRODUCT
+│   ├── do/SKILL.md                 #    Unified entry point
+│   ├── archon/SKILL.md             #    Campaign orchestrator
+│   ├── fleet/SKILL.md              #    Parallel execution
+│   ├── marshal/SKILL.md            #    Single-session orchestrator
+│   ├── review/SKILL.md             #    Code review
+│   ├── ... (19 more skills)
+│   └── README: each skill is a self-contained markdown workflow
+│
+├── agents/                         # Agent role configurations
 │   ├── arch-reviewer.md
 │   ├── archon.md
 │   ├── fleet.md
 │   └── knowledge-extractor.md
-├── runtime/
-│   ├── cli.js                     # CLI entrypoint
-│   ├── bootstrap/
-│   │   ├── init-state.js          # Creates .citadel/ directory tree
-│   │   └── sync-templates.js      # Syncs templates to state dirs
-│   ├── commands/
-│   │   ├── status.js              # Show orchestration state
-│   │   ├── continue.js            # Resume active work
-│   │   └── setup.js               # Stack detection + config
-│   ├── checks/
-│   │   ├── post-edit.js           # Per-file type check + lint
-│   │   ├── quality-gate.js        # Anti-pattern scanning
-│   │   └── circuit-breaker.js     # Failure-loop detection
-│   └── scripts/
-│       ├── coordination.js        # File-based scope claiming
-│       ├── compress-discovery.cjs # Brief generation
-│       └── parse-handoff.cjs      # HANDOFF block extraction
-├── tests/                         # 49 integration tests
-│   ├── router/
-│   ├── commands/
-│   ├── checks/
-│   └── infra/
-├── docs/
-│   ├── architecture.md            # System design
-│   ├── command-surface.md         # CLI reference
-│   ├── runtime.md                 # Runtime checks docs
-│   ├── SKILLS.md                  # Complete skill reference
-│   └── migration-map.md           # Upstream migration tracking
-├── .citadel/                      # Runtime state (gitignored)
-│   ├── campaigns/                 # Active and completed campaigns
-│   ├── fleet/briefs/              # Fleet session briefs
-│   ├── fleet/outputs/             # Fleet wave outputs
-│   ├── coordination/              # Scope claims and instances
-│   ├── intake/                    # Queued work items
-│   ├── templates/                 # Campaign, fleet, intake templates
-│   ├── telemetry/                 # Circuit breaker state, metrics
-│   └── config.json                # Stack detection output
-├── QUICKSTART.md                  # Getting started guide
-├── package.json                   # npm scripts (no dependencies)
-└── LICENSE                        # MIT
+│
+├── core/router/                    # Intent classification engine
+│   ├── classify-intent.js          #   4-tier router (pattern → state → registry → LLM)
+│   └── llm-classifier.js           #   Tier 3 LLM fallback
+│
+├── runtime/                        # Supporting infrastructure
+│   ├── cli.js                      #   CLI entrypoint (for init/setup, not daily use)
+│   ├── bootstrap/                  #   State initialization
+│   ├── commands/                   #   Status, continue, setup
+│   ├── checks/                     #   Post-edit, quality gate, circuit breaker
+│   └── scripts/                    #   Coordination, discovery compression, handoff
+│
+├── .citadel/                       # Runtime state (created by init)
+│   ├── campaigns/                  #   Active campaign files
+│   ├── fleet/                      #   Fleet briefs and outputs
+│   ├── coordination/               #   Scope claims for concurrent work
+│   ├── intake/                     #   Queued work items
+│   ├── templates/                  #   Customizable templates
+│   └── telemetry/                  #   Circuit breaker state
+│
+├── tests/                          # 49 integration tests
+├── docs/                           # Architecture, skills reference, migration map
+├── QUICKSTART.md                   # Getting started guide
+└── package.json                    # npm scripts (zero dependencies)
 ```
 
 ---
 
 ## Configuration
 
+### Environment Variables (optional)
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `CITADEL_LLM_ENDPOINT` | OpenAI-compatible API for Tier 3 classification | *(disabled — Tiers 0-2 handle most input)* |
+| `CITADEL_LLM_MODEL` | LLM model name | `gpt-4o-mini` |
+| `CITADEL_LLM_API_KEY` | API key (Bearer token) | *(none)* |
+
 ### `.citadel/config.json`
 
-Generated by `npm run setup`. Contains auto-detected stack info:
+Generated by `node runtime/cli.js setup`. Contains auto-detected stack:
 
 ```json
 {
@@ -515,37 +346,25 @@ Generated by `npm run setup`. Contains auto-detected stack info:
 }
 ```
 
-### Environment Variables
+### Templates
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `CITADEL_LLM_ENDPOINT` | OpenAI-compatible API URL for Tier 3 | *(disabled)* |
-| `CITADEL_LLM_MODEL` | LLM model name | `gpt-4o-mini` |
-| `CITADEL_LLM_API_KEY` | API key (sent as Bearer token) | *(none)* |
-
-### `.citadel/templates/`
-
-Customizable templates for campaigns, fleet sessions, and intake items. Edit these to match your team's conventions:
-
-- `campaign.md` — Campaign state document template
-- `fleet-session.md` — Fleet session brief template
-- `intake-item.md` — Intake queue item template
+Customizable in `.citadel/templates/`:
+- `campaign.md` — Campaign state document
+- `fleet-session.md` — Fleet session brief
+- `intake-item.md` — Intake queue item
 
 ---
 
 ## Testing
 
 ```bash
-# Run the full suite (49 tests)
-npm test
-
-# Run by category
-npm run test:router       # Intent router — 36 tests
-npm run test:commands     # Status + Continue — 6 tests
-npm run test:checks       # Circuit breaker + Quality gate — 7 tests
+npm test                  # All 49 tests
+npm run test:router       # Intent router (36 tests)
+npm run test:commands     # Status + Continue (6 tests)
+npm run test:checks       # Circuit breaker + Quality gate (7 tests)
 ```
 
-Tests use Node.js built-in test runner (`node:test`) and assertions (`node:assert/strict`). **Zero test dependencies.**
+Zero test dependencies — uses Node.js built-in `node:test` and `node:assert/strict`.
 
 ---
 
@@ -553,42 +372,69 @@ Tests use Node.js built-in test runner (`node:test`) and assertions (`node:asser
 
 | Document | Description |
 |----------|-------------|
-| [QUICKSTART.md](QUICKSTART.md) | Getting started in under 2 minutes |
-| [docs/architecture.md](docs/architecture.md) | System design, state model, and orchestration ladder |
-| [docs/command-surface.md](docs/command-surface.md) | Full CLI command reference |
-| [docs/runtime.md](docs/runtime.md) | Runtime checks documentation |
+| [QUICKSTART.md](QUICKSTART.md) | Getting started in 2 minutes |
 | [docs/SKILLS.md](docs/SKILLS.md) | Complete skill reference with routing examples |
-| [docs/migration-map.md](docs/migration-map.md) | File-by-file upstream migration tracking |
+| [docs/architecture.md](docs/architecture.md) | System design and state model |
+| [docs/command-surface.md](docs/command-surface.md) | CLI and routing reference |
+| [docs/runtime.md](docs/runtime.md) | Runtime checks documentation |
+| [docs/migration-map.md](docs/migration-map.md) | Upstream file-by-file migration tracking |
 
 ---
 
-## What This Is Not
+## What Was Preserved from Upstream Citadel
 
-> [!CAUTION]
-> Citadel Codex is **deliberately platform-agnostic**. The following are permanently excluded by design:
+> [!TIP]
+> **Everything that mattered.** The skills, the orchestration model, the routing logic, the campaign/fleet lifecycle, the coordination safety, the circuit breaker — all preserved. Only the Claude-specific integration layer was replaced.
 
-- **Not a Claude plugin** — No `.claude/` directories, no `.claude-plugin/` manifests
-- **Not a hook system** — No stdin JSON event bus, no lifecycle hooks
-- **Not slash commands** — No `/do`, `/setup`, `/plugin` — explicit CLI instead
-- **Not vendor-locked** — No `CLAUDE_PROJECT_DIR`, no platform-specific env vars
+**Kept:**
+- All 24 skills (including `do` — the unified router)
+- Campaign lifecycle with persistent state
+- Fleet wave-based parallel execution
+- 4-tier intent classification
+- Circuit breaker and quality gates
+- Coordination and scope claiming
+- Session handoff protocol
 
-These were consciously removed during the migration from upstream Citadel. See [docs/migration-map.md](docs/migration-map.md) for the complete rationale.
+**Replaced:**
+- `.claude/` → `.citadel/` (state directory)
+- `.planning/` → `.citadel/` (same)
+- `/do` slash command → `do` skill (same logic, harness-agnostic invocation)
+- Hook bus (stdin JSON) → Explicit check scripts
+- `CLAUDE_PROJECT_DIR` → Standard `process.cwd()`
+- Plugin manifest → Plain directory of skills
+
+**Removed (Claude-only plumbing):**
+- `.claude-plugin/` manifest
+- `hooks-template.json` event bus config
+- `harness-health-util.js` shared hook utility
+- `install-hooks.js` hook installer
+- `docs/HOOKS.md` hook documentation
 
 ---
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Run `npm test` — all 49 tests must pass
-4. Run `npm run check:quality` — no anti-pattern violations
-5. Submit a pull request
+2. Add or modify skills in `skills/`
+3. Run `npm test` — all tests must pass
+4. Submit a pull request
 
-When adding a new skill:
-1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`, `trigger_keywords`)
-2. Add a Tier 0 pattern to `PATTERN_ROUTES` in `core/router/classify-intent.js`
-3. Run `node tests/infra/skill-discovery.test.js` to verify discovery works
-4. Update `docs/SKILLS.md` with the new skill
+### Adding a New Skill
+
+1. Create `skills/<name>/SKILL.md` with YAML frontmatter:
+   ```yaml
+   ---
+   name: my-skill
+   description: >-
+     What this skill does in one or two sentences.
+   trigger_keywords:
+     - keyword1
+     - keyword2
+   ---
+   ```
+2. Add a Tier 0 pattern in `core/router/classify-intent.js` → `PATTERN_ROUTES`
+3. Add the skill to the `do` skill's keyword table and `--list` output
+4. Run `node tests/infra/skill-discovery.test.js` to verify discovery
 
 ---
 

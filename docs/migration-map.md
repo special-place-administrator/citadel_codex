@@ -25,7 +25,7 @@ Target: `E:\project\citadel_codex`
 | `hooks_src/post-edit.js` | `runtime/checks/post-edit.js` | adapted | Dropped stdin JSON protocol, health module, CLAUDE env |
 | `hooks_src/quality-gate.js` | `runtime/checks/quality-gate.js` | adapted | Dropped hook context, health module, made CLI-driven |
 | `hooks_src/circuit-breaker.js` | `runtime/checks/circuit-breaker.js` | adapted | State moved to .citadel/telemetry/, CLI flags replace stdin |
-| `skills/do/SKILL.md` | `core/router/classify-intent.js` + `runtime/commands/` | adapted | Routing concepts kept, slash commands replaced with CLI |
+| `skills/do/SKILL.md` | `skills/do/SKILL.md` + `core/router/classify-intent.js` | adapted | Unified router skill preserved as primary entry point, routing engine extracted to classify-intent.js |
 | `skills/setup/SKILL.md` | `runtime/commands/setup.js` | adapted | Stack detection kept, hook install and CLAUDE.md generation dropped |
 | `skills/archon/SKILL.md` | `skills/archon/SKILL.md` | imported | Already portable |
 | `skills/fleet/SKILL.md` | `skills/fleet/SKILL.md` | imported | Already portable |

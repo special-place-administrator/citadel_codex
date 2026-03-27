@@ -46,11 +46,11 @@ describe('status — empty state', () => {
 });
 
 describe('status — skills count', () => {
-  it('reports 23 installed skills when run against project root', () => {
+  it('reports 24 installed skills when run against project root', () => {
     const output = captureLog(() => run(PROJECT_ROOT));
     assert.ok(
-      output.includes('23 installed'),
-      `Expected "23 installed" in output:\n${output}`
+      output.includes('24 installed'),
+      `Expected "24 installed" in output:\n${output}`
     );
   });
 });

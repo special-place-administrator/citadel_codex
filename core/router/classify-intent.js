@@ -21,6 +21,7 @@ const { llmClassify } = require('./llm-classifier.js');
 // ── Tier 0: Pattern Match ────────────────────────────────────────────────────
 
 const PATTERN_ROUTES = [
+  { patterns: [/\bdo\b/i, /\bjust do it\b/i, /\bhandle this\b/i, /\bfigure it out\b/i], target: 'skill:do', description: 'Unified intent router — single entry point for all work' },
   { patterns: [/\bstatus\b/i], target: 'status', description: 'Show active orchestration state' },
   { patterns: [/\bcontinue\b/i, /\bkeep going\b/i, /\bresume\b/i], target: 'continue', description: 'Resume active work' },
   { patterns: [/\bsetup\b/i, /\bfirst.?run\b/i, /\bconfigure\b/i], target: 'setup', description: 'First-time project setup' },

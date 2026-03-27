@@ -133,9 +133,9 @@ describe('classify — Tier 1 active campaign detection', () => {
 // ── Tier 2: Skill discovery ───────────────────────────────────────────────────
 
 describe('discoverSkills', () => {
-  it('discovers exactly 23 skills', () => {
+  it('discovers exactly 24 skills', () => {
     const skills = discoverSkills(PROJECT_ROOT);
-    assert.equal(skills.length, 23);
+    assert.equal(skills.length, 24);
   });
 
   it('all skills have descriptions longer than 5 chars', () => {
