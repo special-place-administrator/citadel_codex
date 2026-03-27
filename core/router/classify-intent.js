@@ -24,6 +24,7 @@ const PATTERN_ROUTES = [
   { patterns: [/\bsetup\b/i, /\bfirst.?run\b/i, /\bconfigure\b/i], target: 'setup', description: 'First-time project setup' },
   { patterns: [/\binit\b/i, /\bbootstrap\b/i], target: 'init', description: 'Initialize state tree' },
   { patterns: [/\breview\b/i, /\bcode review\b/i], target: 'skill:review', description: 'Code review' },
+  { patterns: [/\bresearch fleet\b/i, /\bmulti.?scout\b/i, /\bparallel research\b/i], target: 'skill:research-fleet', description: 'Parallel multi-scout research' },
   { patterns: [/\bresearch\b/i, /\binvestigate\b/i, /\blook into\b/i], target: 'skill:research', description: 'Research investigation' },
   { patterns: [/\bscaffold\b/i, /\bnew module\b/i, /\bnew component\b/i], target: 'skill:scaffold', description: 'Scaffolding' },
   { patterns: [/\barchitect\b/i, /\barchitecture\b/i], target: 'skill:architect', description: 'Architecture design' },
@@ -42,6 +43,13 @@ const PATTERN_ROUTES = [
   { patterns: [/\bcreate skill\b/i, /\bnew skill\b/i, /\brepeated pattern\b/i], target: 'skill:create-skill', description: 'Create skill from pattern' },
   { patterns: [/\btriage\b/i, /\bprioritize\b/i, /\bclassify issues\b/i], target: 'skill:triage', description: 'Issue triage and prioritization' },
   { patterns: [/\bexperiment\b/i, /\boptimize\b/i, /\bA\/B\b/i, /\bmeasure\b/i], target: 'skill:experiment', description: 'Metric-driven optimization' },
+  // Phase 3 skills
+  { patterns: [/\bcreate app\b/i, /\bnew app\b/i, /\bbuild app\b/i, /\bfull.?stack\b/i], target: 'skill:create-app', description: 'End-to-end app creation' },
+  { patterns: [/\bautopilot\b/i, /\bintake pipeline\b/i, /\bauto.?deliver\b/i], target: 'skill:autopilot', description: 'Intake-to-delivery pipeline' },
+  { patterns: [/\bpostmortem\b/i, /\bretrospective\b/i, /\blessons learned\b/i], target: 'skill:postmortem', description: 'Campaign retrospective' },
+  // Phase 4 skills
+  { patterns: [/\blive preview\b/i, /\bvisual check\b/i, /\bscreenshot\b/i], target: 'skill:live-preview', description: 'Mid-build visual verification' },
+  { patterns: [/\bqa\b/i, /\bplaywright\b/i, /\bbrowser test\b/i, /\be2e test\b/i], target: 'skill:qa', description: 'Browser QA via Playwright' },
 ];
 
 // ── Tier 1: Active State Detection ───────────────────────────────────────────

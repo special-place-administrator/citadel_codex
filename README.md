@@ -25,19 +25,18 @@ node runtime/cli.js route "review my code"  # Test intent routing
 | `.citadel/` | Campaign, fleet, coordination, and runtime state |
 | `docs/` | Architecture, runtime, command surface, and migration docs |
 
-## Skills (9 installed)
+## Skills (23 installed)
 
-| Skill | Description |
-|-------|-------------|
-| `review` | 5-pass structured code review (correctness, security, performance, readability, consistency) |
-| `research` | Focused investigation with confidence levels and source citations |
-| `scaffold` | Project-aware file generation matching existing conventions |
-| `prd` | Product requirements document from natural language descriptions |
-| `architect` | Implementation architecture with phased build plan from PRD |
-| `archon` | Multi-session campaign orchestration |
-| `fleet` | Parallel agent coordination with safety controls |
-| `session-handoff` | Session context transfer between agents |
-| `systematic-debugging` | 4-phase root cause analysis |
+| Category | Skills |
+|----------|--------|
+| Orchestration | `archon`, `fleet`, `marshal`, `autopilot` |
+| Dev Lifecycle | `prd`, `architect`, `scaffold`, `create-app` |
+| Code Quality | `review`, `refactor`, `test-gen`, `qa`, `live-preview` |
+| Research | `research`, `research-fleet`, `systematic-debugging`, `triage` |
+| Docs & Design | `doc-gen`, `design`, `postmortem` |
+| Meta | `create-skill`, `experiment`, `session-handoff` |
+
+See [docs/SKILLS.md](docs/SKILLS.md) for descriptions and routing examples.
 
 ## Runtime Checks
 

@@ -41,20 +41,23 @@ Target: `E:\project\citadel_codex`
 | `hooks/hooks-template.json` | — | rejected | Hook bus config, replaced by explicit CLI |
 | `hooks_src/harness-health-util.js` | — | rejected | Hook-specific shared utility |
 | `scripts/install-hooks.js` | — | rejected | Hook installer, not needed |
-| `skills/create-app/SKILL.md` | — | deferred | Complex, depends on full orchestrator stack |
-| `skills/create-skill/SKILL.md` | — | deferred | Useful, waiting on skill registration infra |
-| `skills/marshal/SKILL.md` | — | deferred | Single-session orchestrator, needs runtime |
-| `skills/doc-gen/SKILL.md` | — | deferred | Documentation generator |
-| `skills/refactor/SKILL.md` | — | deferred | Refactoring orchestrator |
-| `skills/test-gen/SKILL.md` | — | deferred | Test generation |
-| `skills/experiment/SKILL.md` | — | deferred | Metric-driven optimization |
-| `skills/autopilot/SKILL.md` | — | deferred | Intake pipeline automation |
-| `skills/live-preview/SKILL.md` | — | deferred | Browser-based preview |
-| `skills/qa/SKILL.md` | — | deferred | Browser QA via Playwright |
-| `skills/postmortem/SKILL.md` | — | deferred | Campaign postmortem |
-| `skills/design/SKILL.md` | — | deferred | Design manifest |
-| `skills/research-fleet/SKILL.md` | — | deferred | Multi-scout research |
-| `agents/` | — | deferred | Agent configs, needs Codex agent model |
-| `docs/SKILLS.md` | — | deferred | Skill reference doc |
+| `skills/create-app/SKILL.md` | `skills/create-app/SKILL.md` | adapted | Stripped Claude refs, .planning→.citadel |
+| `skills/create-skill/SKILL.md` | `skills/create-skill/SKILL.md` | adapted | Stripped 11 Claude refs, .planning→.citadel |
+| `skills/marshal/SKILL.md` | `skills/marshal/SKILL.md` | adapted | .planning→.citadel, neutralized handoff |
+| `skills/doc-gen/SKILL.md` | `skills/doc-gen/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/refactor/SKILL.md` | `skills/refactor/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/test-gen/SKILL.md` | `skills/test-gen/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/experiment/SKILL.md` | `skills/experiment/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/autopilot/SKILL.md` | `skills/autopilot/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/live-preview/SKILL.md` | `skills/live-preview/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/qa/SKILL.md` | `skills/qa/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/postmortem/SKILL.md` | `skills/postmortem/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/design/SKILL.md` | `skills/design/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `skills/research-fleet/SKILL.md` | `skills/research-fleet/SKILL.md` | adapted | .planning→.citadel, removed Claude refs |
+| `agents/arch-reviewer.md` | `agents/arch-reviewer.md` | adapted | .planning→.citadel, neutralized Claude refs |
+| `agents/archon.md` | `agents/archon.md` | adapted | .planning→.citadel, neutralized Claude refs |
+| `agents/fleet.md` | `agents/fleet.md` | adapted | .planning→.citadel, neutralized Claude refs |
+| `agents/knowledge-extractor.md` | `agents/knowledge-extractor.md` | adapted | .planning→.citadel, neutralized Claude refs |
+| `docs/SKILLS.md` | `docs/SKILLS.md` | adapted | Written as Codex-native skill reference |
 | `docs/HOOKS.md` | — | rejected | Hook documentation, not applicable |
-| `QUICKSTART.md` | — | deferred | Needs rewrite for Codex |
+| `QUICKSTART.md` | `QUICKSTART.md` | adapted | Rewritten for Codex-native workflow |

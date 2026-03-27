@@ -16,12 +16,13 @@ The rule is unchanged from upstream Citadel: use the cheapest level that fits th
 | Directory | Purpose |
 |-----------|---------|
 | `core/router/` | Intent classification and routing (`classify-intent.js`) |
-| `skills/` | Portable Codex-oriented skill definitions (9 installed) |
+| `skills/` | Portable Codex-oriented skill definitions (23 installed) |
 | `runtime/cli.js` | CLI entrypoint — `init`, `status`, `continue`, `setup`, `route` |
 | `runtime/bootstrap/` | State initialization (`init-state.js`) and template sync (`sync-templates.js`) |
 | `runtime/commands/` | Command implementations: `status.js`, `continue.js`, `setup.js` |
 | `runtime/checks/` | Explicit verification: `post-edit.js`, `quality-gate.js`, `circuit-breaker.js` |
 | `runtime/scripts/` | Coordination, discovery compression, and handoff parsing utilities |
+| `agents/` | Specialized agent role configurations (4 configs) |
 | `.citadel/` | Neutral runtime state and templates |
 | `docs/` | Architecture, runtime, command surface, and migration documentation |
 | `tests/` | Smoke tests for runtime scripts |
