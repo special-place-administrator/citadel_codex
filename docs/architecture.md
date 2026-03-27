@@ -16,7 +16,7 @@ The rule is unchanged from upstream Citadel: use the cheapest level that fits th
 | Directory | Purpose |
 |-----------|---------|
 | `core/router/` | Intent classification and routing (`classify-intent.js`) |
-| `skills/` | Portable Codex-oriented skill definitions (24 installed) |
+| `skills/` | Portable Codex-oriented skill definitions (25 installed) |
 | `runtime/cli.js` | CLI entrypoint — `init`, `status`, `continue`, `setup`, `route` |
 | `runtime/bootstrap/` | State initialization (`init-state.js`) and template sync (`sync-templates.js`) |
 | `runtime/commands/` | Command implementations: `status.js`, `continue.js`, `setup.js` |

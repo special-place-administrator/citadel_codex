@@ -1,6 +1,6 @@
 # Skill Reference
 
-24 skills organized by category. Each skill is a markdown workflow definition in `skills/<name>/SKILL.md`.
+25 skills organized by category. Each skill is a markdown workflow definition in `skills/<name>/SKILL.md`.
 
 ## Entry Point
 
@@ -16,6 +16,7 @@
 | `fleet` | Parallel campaign coordinator. Splits work into non-overlapping waves, shares discoveries between waves, and records results. |
 | `marshal` | Meta-orchestrator that chains skills and context into a completed deliverable within a single session. |
 | `autopilot` | Intake-to-delivery pipeline. Processes pending items from `.citadel/intake/`: briefs new ideas, executes approved work through the orchestration ladder. |
+| `setup` | First-run experience. Detects the project stack, scaffolds `.citadel/` state, generates configuration, runs a demo task, and prints a reference card. |
 
 ## Development Lifecycle
 
@@ -82,4 +83,4 @@ node runtime/cli.js route "create a new app"       # Routes to skill:create-app
 node runtime/cli.js route "debug this crash"       # Routes to skill:systematic-debugging
 ```
 
-All 23 skills have Tier 0 keyword patterns for instant routing. Skills without a Tier 0 match fall through to Tier 2 (skill registry name matching).
+All 25 skills have Tier 0 keyword patterns for instant routing. Skills without a Tier 0 match fall through to Tier 2 (skill registry name matching).

@@ -24,7 +24,7 @@ const PATTERN_ROUTES = [
   { patterns: [/\bdo\b/i, /\bjust do it\b/i, /\bhandle this\b/i, /\bfigure it out\b/i], target: 'skill:do', description: 'Unified intent router — single entry point for all work' },
   { patterns: [/\bstatus\b/i], target: 'status', description: 'Show active orchestration state' },
   { patterns: [/\bcontinue\b/i, /\bkeep going\b/i, /\bresume\b/i], target: 'continue', description: 'Resume active work' },
-  { patterns: [/\bsetup\b/i, /\bfirst.?run\b/i, /\bconfigure\b/i], target: 'setup', description: 'First-time project setup' },
+  { patterns: [/\bsetup\b/i, /\bfirst.?run\b/i, /\bconfigure\b/i, /\bgetting started\b/i, /\binitialize project\b/i], target: 'skill:setup', description: 'First-time project setup' },
   { patterns: [/\binit\b/i, /\bbootstrap\b/i], target: 'init', description: 'Initialize state tree' },
   { patterns: [/\breview\b/i, /\bcode review\b/i], target: 'skill:review', description: 'Code review' },
   { patterns: [/\bresearch fleet\b/i, /\bmulti.?scout\b/i, /\bparallel research\b/i], target: 'skill:research-fleet', description: 'Parallel multi-scout research' },

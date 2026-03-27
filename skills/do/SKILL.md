@@ -64,6 +64,7 @@ Regex/keyword on raw input. Catches trivial commands and well-known skill trigge
 |---|---|
 | "status" | Show active campaigns, fleet sessions, pending intake |
 | "continue" or "keep going" or "resume" | Resume active campaign or fleet session |
+| "setup", "first-run", "configure" | Invoke skill: `setup` |
 | "review", "code review" | Invoke skill: `review` |
 | "research fleet", "multi-scout", "parallel research" | Invoke skill: `research-fleet` |
 | "research", "investigate", "look into" | Invoke skill: `research` |
@@ -185,6 +186,7 @@ ORCHESTRATION
   archon [direction]     Multi-session campaigns
   fleet [direction]      Parallel campaigns with coordination safety
   autopilot              Intake-to-delivery pipeline
+  setup                  First-run project configuration
 
 APP CREATION
   prd                    Product requirements document

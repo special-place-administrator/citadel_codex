@@ -27,7 +27,7 @@ describe('classify — Tier 0 built-in commands', () => {
   it('routes "setup" to setup', () => {
     const r = classify('setup', PROJECT_ROOT);
     assert.equal(r.tier, 0);
-    assert.equal(r.target, 'setup');
+    assert.equal(r.target, 'skill:setup');
   });
 
   it('routes "init" to init', () => {
@@ -133,9 +133,9 @@ describe('classify — Tier 1 active campaign detection', () => {
 // ── Tier 2: Skill discovery ───────────────────────────────────────────────────
 
 describe('discoverSkills', () => {
-  it('discovers exactly 24 skills', () => {
+  it('discovers exactly 25 skills', () => {
     const skills = discoverSkills(PROJECT_ROOT);
-    assert.equal(skills.length, 24);
+    assert.equal(skills.length, 25);
   });
 
   it('all skills have descriptions longer than 5 chars', () => {

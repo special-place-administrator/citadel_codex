@@ -2,12 +2,12 @@
 
 # Citadel Codex
 
-**AI agent orchestration skills — one entry point, 24 workflows, any harness**
+**AI agent orchestration skills — one entry point, 25 workflows, any harness**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/Tests-49%20passing-brightgreen)](tests/)
-[![Skills](https://img.shields.io/badge/Skills-24%20installed-purple)](docs/SKILLS.md)
+[![Skills](https://img.shields.io/badge/Skills-25%20installed-purple)](docs/SKILLS.md)
 
 *Codex-native port of [Citadel](https://github.com/SethGammon/Citadel). Same orchestration skills, any AI harness.*
 
@@ -19,7 +19,7 @@
 
 Citadel Codex is a **skill library** for AI coding agents. You install the skills into your harness — [Codex CLI](https://github.com/openai/codex), Claude Code, Cursor, Aider, or any tool that can read markdown skill files — and they give your agent structured workflows for everything from code review to multi-session campaigns.
 
-The single entry point is the **`do` skill**. Tell it what you want in plain language. It classifies your intent, picks the cheapest capable skill, and orchestrates execution. You don't choose between 24 skills — `do` chooses for you.
+The single entry point is the **`do` skill**. Tell it what you want in plain language. It classifies your intent, picks the cheapest capable skill, and orchestrates execution. You don't choose between 25 skills — `do` chooses for you.
 
 > [!IMPORTANT]
 > **You never run CLI commands directly.** Skills are loaded by your AI harness. The `runtime/` directory provides supporting infrastructure (state management, intent classification, checks) that the skills reference — but users interact through their harness, not through `node` commands.
@@ -138,7 +138,7 @@ The `do` skill classifies your intent through 4 tiers, each more expensive than 
 
 ---
 
-## Skills (24)
+## Skills (25)
 
 ### Orchestration
 
@@ -149,6 +149,7 @@ The `do` skill classifies your intent through 4 tiers, each more expensive than 
 | `archon` | Multi-session campaigns with phases, tracked in `.citadel/campaigns/`. |
 | `fleet` | Parallel wave-based execution with shared discoveries between agents. |
 | `autopilot` | Processes `.citadel/intake/` queue: briefs ideas, executes approved work. |
+| `setup` | First-run project configuration: detects stack, scaffolds `.citadel/`, generates config, prints reference card. |
 
 ### Development Lifecycle
 
@@ -287,7 +288,7 @@ citadel_codex/
 │   ├── fleet/SKILL.md              #    Parallel execution
 │   ├── marshal/SKILL.md            #    Single-session orchestrator
 │   ├── review/SKILL.md             #    Code review
-│   ├── ... (19 more skills)
+│   ├── ... (20 more skills)
 │   └── README: each skill is a self-contained markdown workflow
 │
 ├── agents/                         # Agent role configurations
@@ -387,7 +388,7 @@ Zero test dependencies — uses Node.js built-in `node:test` and `node:assert/st
 > **Everything that mattered.** The skills, the orchestration model, the routing logic, the campaign/fleet lifecycle, the coordination safety, the circuit breaker — all preserved. Only the Claude-specific integration layer was replaced.
 
 **Kept:**
-- All 24 skills (including `do` — the unified router)
+- All 25 skills (including `do` — the unified router)
 - Campaign lifecycle with persistent state
 - Fleet wave-based parallel execution
 - 4-tier intent classification
