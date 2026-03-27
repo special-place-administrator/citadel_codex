@@ -24,6 +24,24 @@ It takes the battle-tested orchestration ideas from the Citadel framework and st
 > [!NOTE]
 > **This is not a plugin.** Citadel Codex is a standalone framework. No `.claude/` directories, no slash commands, no hook bus. Just Node.js and your terminal.
 
+### `/do` is dead — long live the CLI
+
+Upstream Citadel's primary entry point was the `/do` slash command — a magic router inside Claude's plugin system. **Citadel Codex kills `/do` entirely.** In its place:
+
+| What died | What replaced it |
+|-----------|-----------------|
+| `/do review my code` | `node runtime/cli.js route "review my code"` |
+| `/do debug this crash` | `node runtime/cli.js route "debug this crash"` |
+| `/setup` | `node runtime/cli.js setup` |
+| `/do continue` | `node runtime/cli.js continue` |
+| `.claude/harness.json` routing config | `core/router/classify-intent.js` (code, not config) |
+| `.planning/` state directory | `.citadel/` state directory |
+| Plugin hook bus (stdin JSON events) | Explicit CLI invocations |
+| `CLAUDE_PROJECT_DIR` env var | Standard `process.cwd()` |
+
+> [!CAUTION]
+> If you're coming from upstream Citadel: **every `/do` and `/setup` reference is gone.** Skills, campaigns, fleet orchestration, and the routing logic all survived — but the interface is completely rebuilt. Nothing depends on Claude's plugin lifecycle.
+
 ---
 
 ## Table of Contents
