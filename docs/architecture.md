@@ -73,7 +73,7 @@ The router (`core/router/classify-intent.js`) classifies input using three tiers
 2. **Tier 1 — Active State**: checks `.citadel/campaigns/` and `.citadel/fleet/` for active work.
 3. **Tier 2 — Skill Registry**: matches input against `skills/*/SKILL.md` frontmatter.
 
-The upstream LLM classifier (Tier 3) is deferred — Tiers 0-2 are sufficient for the current skill set.
+Tier 3 (LLM classifier) is available as an optional async fallback. Configure `CITADEL_LLM_ENDPOINT`, `CITADEL_LLM_MODEL`, and optionally `CITADEL_LLM_API_KEY` to enable it. Uses OpenAI-compatible chat completions API (works with Ollama, OpenAI, Anthropic-compatible proxies, etc.).
 
 ## Runtime Scripts
 

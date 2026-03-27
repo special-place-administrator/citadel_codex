@@ -11,10 +11,12 @@
  *   Tier 0: Pattern match on raw input (keywords, regex)
  *   Tier 1: Active state short-circuit (campaigns, fleet)
  *   Tier 2: Skill keyword match from skills/
+ *   Tier 3: LLM classifier fallback (async, optional)
  */
 
 const fs = require('fs');
 const path = require('path');
+const { llmClassify } = require('./llm-classifier.js');
 
 // ── Tier 0: Pattern Match ────────────────────────────────────────────────────
 
@@ -185,6 +187,24 @@ function classify(input, projectRoot) {
   return { tier: -1, target: null, description: 'No routing match', confidence: 0 };
 }
 
+// ── Classify (async, with Tier 3) ────────────────────────────────────────────
+
+async function classifyAsync(input, projectRoot) {
+  // Run Tiers 0-2 synchronously first
+  const syncResult = classify(input, projectRoot);
+  if (syncResult.tier >= 0) return syncResult;
+
+  // Tier 3: LLM classifier (only if env configured)
+  const root = projectRoot || process.cwd();
+  const skills = discoverSkills(root);
+  const llmResult = await llmClassify(input, skills);
+  if (llmResult) {
+    return { tier: 3, ...llmResult };
+  }
+
+  return syncResult; // Return the original no-match
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function safeReaddir(dir) {
@@ -195,7 +215,7 @@ function safeRead(file) {
   try { return fs.readFileSync(file, 'utf8'); } catch { return ''; }
 }
 
-module.exports = { classify, detectActiveState, discoverSkills, PATTERN_ROUTES };
+module.exports = { classify, classifyAsync, detectActiveState, discoverSkills, PATTERN_ROUTES };
 
 if (require.main === module) {
   const input = process.argv.slice(2).join(' ');
@@ -203,6 +223,7 @@ if (require.main === module) {
     console.log('Usage: node classify-intent.js <intent text>');
     process.exit(0);
   }
-  const result = classify(input);
-  console.log(JSON.stringify(result, null, 2));
+  classifyAsync(input).then(result => {
+    console.log(JSON.stringify(result, null, 2));
+  });
 }

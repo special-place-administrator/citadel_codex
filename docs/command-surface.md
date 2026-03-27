@@ -33,6 +33,12 @@ If found, routes to `continue`.
 **Tier 2 — Skill Keyword Match** (cost: ~0, latency: <10ms)
 Matches input against installed skills discovered from `skills/*/SKILL.md`.
 
+**Tier 3 — LLM Classifier** (cost: varies, latency: network-bound, optional async fallback)
+Called only when Tiers 0-2 all miss. Requires `CITADEL_LLM_ENDPOINT` env var. Uses an
+OpenAI-compatible chat completions API (Ollama, OpenAI, Anthropic-compatible proxies).
+Optional: `CITADEL_LLM_MODEL` (default: `gpt-4o-mini`), `CITADEL_LLM_API_KEY`.
+Available via `classifyAsync()` — the synchronous `classify()` function is unchanged.
+
 ## Differences from Upstream Citadel
 
 | Aspect | Upstream (`/do`) | Codex-native |
@@ -42,7 +48,7 @@ Matches input against installed skills discovered from `skills/*/SKILL.md`.
 | Skill discovery | `.claude/skills/` + plugin built-ins | `skills/*/SKILL.md` |
 | State directory | `.planning/` | `.citadel/` |
 | Hook installation | `scripts/install-hooks.js` | Not needed (explicit invocation) |
-| LLM classifier (Tier 3) | Yes | Not yet (deferred — Tier 0-2 sufficient for MVP) |
+| LLM classifier (Tier 3) | Yes | Yes — optional async fallback via `classifyAsync()` |
 
 ## npm Scripts
 
