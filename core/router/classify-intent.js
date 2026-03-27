@@ -32,6 +32,12 @@ const PATTERN_ROUTES = [
   { patterns: [/\bhandoff\b/i, /\bsession summary\b/i], target: 'skill:session-handoff', description: 'Session handoff' },
   { patterns: [/\bcampaign\b/i, /\bmulti.?session\b/i, /\bphases\b/i], target: 'skill:archon', description: 'Campaign orchestration' },
   { patterns: [/\bfleet\b/i, /\bparallel\b/i, /\bmultiple agents\b/i], target: 'skill:fleet', description: 'Fleet orchestration' },
+  // Phase 1 skills
+  { patterns: [/\bmarshal\b/i, /\borchestrate\b/i, /\bchain skills\b/i, /\bmulti.?step\b/i], target: 'skill:marshal', description: 'Single-session orchestration' },
+  { patterns: [/\bdocument\b/i, /\bdocs?\b/i, /\bdocstring\b/i, /\breadme\b/i], target: 'skill:doc-gen', description: 'Documentation generation' },
+  { patterns: [/\brefactor\b/i, /\brename\b/i, /\bextract\b/i, /\bsplit file\b/i], target: 'skill:refactor', description: 'Safe multi-file refactoring' },
+  { patterns: [/\btest.?gen\b/i, /\bgenerate tests\b/i, /\bwrite tests\b/i], target: 'skill:test-gen', description: 'Test generation' },
+  { patterns: [/\bdesign manifest\b/i, /\bstyle guide\b/i, /\bvisual consistency\b/i], target: 'skill:design', description: 'Design manifest generation' },
 ];
 
 // ── Tier 1: Active State Detection ───────────────────────────────────────────
