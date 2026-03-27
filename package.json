@@ -4,12 +4,25 @@
   "description": "Codex-native orchestration foundation derived from Citadel concepts",
   "license": "MIT",
   "scripts": {
+    "init": "node runtime/cli.js init",
+    "init:state": "node runtime/cli.js init",
+    "status": "node runtime/cli.js status",
+    "setup": "node runtime/cli.js setup",
+    "continue": "node runtime/cli.js continue",
+    "route": "node runtime/cli.js route",
+    "check:post-edit": "node runtime/checks/post-edit.js",
+    "check:quality": "node runtime/checks/quality-gate.js",
+    "check:breaker": "node runtime/checks/circuit-breaker.js",
+    "test": "node --test tests/**/*.test.js",
+    "test:infra": "node --test tests/infra/*.test.js",
+    "test:router": "node --test tests/router/*.test.js",
+    "test:commands": "node --test tests/commands/*.test.js",
+    "test:checks": "node --test tests/checks/*.test.js",
     "coord": "node runtime/scripts/coordination.js",
     "coord:status": "node runtime/scripts/coordination.js status",
     "coord:sweep": "node runtime/scripts/coordination.js sweep",
     "compress:discovery": "node runtime/scripts/compress-discovery.cjs",
-    "parse:handoff": "node runtime/scripts/parse-handoff.cjs",
-    "init:state": "node runtime/cli.js init"
+    "parse:handoff": "node runtime/scripts/parse-handoff.cjs"
   },
   "keywords": [
     "codex",
