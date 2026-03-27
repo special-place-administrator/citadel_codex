@@ -44,23 +44,41 @@ Import now:
 
 Defer for later adaptation:
 
-- additional reusable skills such as `review`, `research`, `scaffold`, and `prd`
 - agent prompt files under `agents/`
-- assets that support richer documentation but are not needed for the first working baseline
-- telemetry utilities beyond discovery compression
+- assets that support richer documentation
+- remaining skills: `create-app`, `create-skill`, `marshal`, `doc-gen`, `refactor`, `test-gen`, `experiment`, `autopilot`, `live-preview`, `qa`, `postmortem`, `design`, `research-fleet`
+- upstream `QUICKSTART.md` (needs full rewrite for Codex)
 
-Do not copy as part of the baseline:
+Ported since initial audit (2026-03-27):
 
-- `.claude/` project state and settings
-- `.claude-plugin/` plugin manifest and installation surface
-- `hooks/` and `hooks_src/`
-- `scripts/install-hooks.js`
-- `CLAUDE.md`, `README.md`, and `QUICKSTART.md` from upstream in their current form
-- `skills/do/` and `skills/setup/`
+- `skills/review/`, `skills/research/`, `skills/scaffold/`, `skills/prd/`, `skills/architect/` — adapted with .citadel paths and Claude refs removed
+- `hooks_src/init-project.js` → `runtime/bootstrap/init-state.js` + `sync-templates.js`
+- `hooks_src/post-edit.js` → `runtime/checks/post-edit.js`
+- `hooks_src/quality-gate.js` → `runtime/checks/quality-gate.js`
+- `hooks_src/circuit-breaker.js` → `runtime/checks/circuit-breaker.js`
+- `skills/do/SKILL.md` → `core/router/classify-intent.js` + `runtime/commands/`
+- `skills/setup/SKILL.md` → `runtime/commands/setup.js`
+
+## Permanent Exclusions (Rejected)
+
+These will NEVER be ported — they are structurally incompatible with Codex:
+
+| Path | Reason |
+|------|--------|
+| `.claude/` | Claude-specific project state and settings directory |
+| `.claude-plugin/` | Plugin manifest and installation surface |
+| `hooks/hooks-template.json` | Hook bus configuration, replaced by explicit CLI |
+| `hooks_src/harness-health-util.js` | Shared utility for hook-specific telemetry and config |
+| `scripts/install-hooks.js` | Hook installer, not needed (no hook bus in Codex) |
+| `docs/HOOKS.md` | Hook documentation, not applicable |
+| `CLAUDE.md` (upstream) | Claude plugin installation instructions |
 
 ## Why These Were Excluded
 
 - `.claude*` content is tied to Claude-specific project state and plugin mechanics.
-- hook files depend on Claude lifecycle events and environment variables such as `CLAUDE_PROJECT_DIR` and `CLAUDE_PLUGIN_ROOT`.
-- `/do` and `/plugin` workflows assume a Claude command surface that does not exist in Codex.
-- upstream top-level docs describe installation and operation as a Claude plugin, which would mislead users of this fork if copied directly.
+- Hook files depend on Claude lifecycle events and environment variables (`CLAUDE_PROJECT_DIR`, `CLAUDE_PLUGIN_ROOT`).
+- The hook bus model (stdin JSON events, exit codes as signals) is replaced by explicit CLI invocation.
+- `/do` and `/plugin` workflows assumed a Claude command surface — concepts were kept but interface was rebuilt.
+- Upstream top-level docs describe installation as a Claude plugin, which would mislead Codex users.
+
+See [migration-map.md](migration-map.md) for the complete file-by-file mapping.

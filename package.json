@@ -8,7 +8,8 @@
     "coord:status": "node runtime/scripts/coordination.js status",
     "coord:sweep": "node runtime/scripts/coordination.js sweep",
     "compress:discovery": "node runtime/scripts/compress-discovery.cjs",
-    "parse:handoff": "node runtime/scripts/parse-handoff.cjs"
+    "parse:handoff": "node runtime/scripts/parse-handoff.cjs",
+    "init:state": "node runtime/cli.js init"
   },
   "keywords": [
     "codex",
