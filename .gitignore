@@ -15,7 +15,13 @@
 !.citadel/screenshots/.gitkeep
 .citadel/telemetry/*.jsonl
 .citadel/telemetry/*.log
+.citadel/telemetry/*.json
 .citadel/telemetry/.typecheck-notified
+.citadel/config.json
+
+# Tool indexes
+.symforge/
+.letta/
 
 # Node
 node_modules/
