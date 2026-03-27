@@ -38,6 +38,10 @@ const PATTERN_ROUTES = [
   { patterns: [/\brefactor\b/i, /\brename\b/i, /\bextract\b/i, /\bsplit file\b/i], target: 'skill:refactor', description: 'Safe multi-file refactoring' },
   { patterns: [/\btest.?gen\b/i, /\bgenerate tests\b/i, /\bwrite tests\b/i], target: 'skill:test-gen', description: 'Test generation' },
   { patterns: [/\bdesign manifest\b/i, /\bstyle guide\b/i, /\bvisual consistency\b/i], target: 'skill:design', description: 'Design manifest generation' },
+  // Phase 2 skills
+  { patterns: [/\bcreate skill\b/i, /\bnew skill\b/i, /\brepeated pattern\b/i], target: 'skill:create-skill', description: 'Create skill from pattern' },
+  { patterns: [/\btriage\b/i, /\bprioritize\b/i, /\bclassify issues\b/i], target: 'skill:triage', description: 'Issue triage and prioritization' },
+  { patterns: [/\bexperiment\b/i, /\boptimize\b/i, /\bA\/B\b/i, /\bmeasure\b/i], target: 'skill:experiment', description: 'Metric-driven optimization' },
 ];
 
 // ── Tier 1: Active State Detection ───────────────────────────────────────────
