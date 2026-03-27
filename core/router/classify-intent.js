@@ -79,12 +79,35 @@ function discoverSkills(projectRoot) {
 
     const content = safeRead(skillFile);
     const nameMatch = content.match(/^name:\s*(.+)$/m);
+    let description = '';
     const descMatch = content.match(/^description:\s*(.+)$/m);
+    if (descMatch) {
+      const raw = descMatch[1].trim();
+      if (/^[>|]-?$/.test(raw)) {
+        // YAML multi-line: grab the indented lines that follow
+        const descIdx = content.indexOf(descMatch[0]);
+        const after = content.slice(descIdx + descMatch[0].length);
+        const lines = after.split('\n');
+        const descLines = [];
+        for (const line of lines) {
+          if (/^\s+\S/.test(line)) {
+            descLines.push(line.trim());
+          } else if (line.trim() === '') {
+            continue;
+          } else {
+            break;
+          }
+        }
+        description = descLines.join(' ');
+      } else {
+        description = raw;
+      }
+    }
 
     skills.push({
       name: nameMatch ? nameMatch[1].trim() : dir,
       dir,
-      description: descMatch ? descMatch[1].trim() : '',
+      description,
     });
   }
 
